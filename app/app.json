@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "Strava Overlay",
+    "slug": "strava-overlay-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.stravaoverlay.app"
+    },
+    "android": {
+      "package": "com.stravaoverlay.app"
+    },
+    "scheme": "stravasocial"
+  }
+}
