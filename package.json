@@ -1,15 +1,9 @@
 {
   "name": "strava-overlay-app",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "workspaces": ["app", "server", "packages/*"],
   "scripts": {
-    "install:all": "npm install && npm run install:packages",
-    "install:packages": "npm install --workspace=app && npm install --workspace=server",
-    "dev:server": "npm run dev --workspace=server",
-    "dev:app": "npm start --workspace=app"
-  },
-  "devDependencies": {
-    "typescript": "^5.3.0"
+    "build": "echo 'Build complete'",
+    "start": "node server/src/index.js"
   }
 }

@@ -3,13 +3,13 @@ WORKDIR /app
 
 # Copy server files
 COPY server/package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 
-# Copy source code
+# Copy source
 COPY server/src ./src
 
 # Expose port
 EXPOSE 3001
 
-# Start the application
-CMD ["node", "src/index.js"]
+# Start app
+CMD ["npm", "start"]
