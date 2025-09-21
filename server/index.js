@@ -19,3 +19,20 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 // Updated Sun 21 Sep 2025 21:02:54 BST
+
+// OAuth callback endpoint
+app.get('/auth/callback', (req, res) => {
+  const { code, scope, error } = req.query;
+  
+  if (error) {
+    return res.json({ error: 'OAuth denied', details: error });
+  }
+  
+  res.json({
+    success: true,
+    message: 'OAuth code received successfully!',
+    code: code,
+    scope: scope,
+    next_step: 'Exchange this code for access token'
+  });
+});
