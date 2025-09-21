@@ -36,3 +36,28 @@ app.get('/auth/callback', (req, res) => {
     next_step: 'Exchange this code for access token'
   });
 });
+
+// Token exchange endpoint
+app.post('/auth/token', async (req, res) => {
+  const { code } = req.body;
+  
+  if (!code) {
+    return res.status(400).json({ error: 'Authorization code required' });
+  }
+
+  try {
+    console.log('Received OAuth code:', code);
+    
+    // For now, just confirm we received the code
+    // Real Strava token exchange will be added next
+    res.json({
+      success: true,
+      message: 'Code received - ready for Strava token exchange',
+      code_received: code.substring(0, 8) + '...',
+      next: 'Add axios dependency for real Strava API calls'
+    });
+    
+  } catch (error) {
+    res.status(500).json({ error: 'Token exchange failed' });
+  }
+});
