@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+app.use(express.json());
+
 app.get('/', (req, res) => {
   res.json({ message: 'Hello World! Server is running.' });
 });
@@ -15,12 +17,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-// Updated Sun 21 Sep 2025 21:02:54 BST
-
-// OAuth callback endpoint
 app.get('/auth/callback', (req, res) => {
   const { code, scope, error } = req.query;
   
@@ -37,7 +33,6 @@ app.get('/auth/callback', (req, res) => {
   });
 });
 
-// Token exchange endpoint
 app.post('/auth/token', async (req, res) => {
   const { code } = req.body;
   
@@ -48,8 +43,6 @@ app.post('/auth/token', async (req, res) => {
   try {
     console.log('Received OAuth code:', code);
     
-    // For now, just confirm we received the code
-    // Real Strava token exchange will be added next
     res.json({
       success: true,
       message: 'Code received - ready for Strava token exchange',
@@ -60,4 +53,8 @@ app.post('/auth/token', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Token exchange failed' });
   }
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
