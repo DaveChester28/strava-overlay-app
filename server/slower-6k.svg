@@ -1,0 +1,30 @@
+
+<svg width="1080" height="1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8fafc;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e2e8f0;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="100%" height="100%" fill="url(#bgGradient)"/>
+  
+  <text x="540" y="200" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="48" font-weight="bold">Slower 6k - Trying to find the 7 minute KM pace</text>
+  
+  <text x="540" y="400" text-anchor="middle" fill="#1e293b" font-family="Arial, sans-serif" font-size="120" font-weight="bold">6:04</text>
+  
+  <text x="540" y="450" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="32" font-weight="bold">PER KM</text>
+  
+  <text x="150" y="650" text-anchor="start" fill="#1e293b" font-family="Arial, sans-serif" font-size="36" font-weight="bold">6.1 km</text>
+  <text x="150" y="680" text-anchor="start" fill="#64748b" font-family="Arial, sans-serif" font-size="24">DISTANCE</text>
+  
+  <text x="400" y="650" text-anchor="start" fill="#1e293b" font-family="Arial, sans-serif" font-size="36" font-weight="bold">36 min</text>
+  <text x="400" y="680" text-anchor="start" fill="#64748b" font-family="Arial, sans-serif" font-size="24">TIME</text>
+  
+  <text x="650" y="650" text-anchor="start" fill="#1e293b" font-family="Arial, sans-serif" font-size="36" font-weight="bold">70 m</text>
+  <text x="650" y="680" text-anchor="start" fill="#64748b" font-family="Arial, sans-serif" font-size="24">ELEVATION</text>
+  
+  <text x="540" y="800" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="28">9/13/2025</text>
+  
+  <text x="1030" y="1030" text-anchor="end" fill="#64748b" font-family="Arial, sans-serif" font-size="20">Powered by Strava</text>
+</svg>
