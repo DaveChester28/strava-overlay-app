@@ -54,17 +54,20 @@ app.post('/auth/token', async (req, res) => {
     console.log('Strava OAuth successful for athlete:', tokenResponse.data.athlete.id);
 
     res.json({
-      success: true,
-      message: 'Successfully connected to Strava!',
-      data: {
-        access_token: tokenResponse.data.access_token,
-        athlete: {
-          id: tokenResponse.data.athlete.id,
-          name: `${tokenResponse.data.athlete.firstname} ${tokenResponse.data.athlete.lastname}`,
-          profile_picture: tokenResponse.data.athlete.profile
-        }
-      }
-    });
+  success: true,
+  message: 'Successfully connected to Strava!',
+  data: {
+    access_token: tokenResponse.data.access_token,
+    refresh_token: tokenResponse.data.refresh_token,
+    expires_at: tokenResponse.data.expires_at,
+    athlete: {
+      id: tokenResponse.data.athlete.id,
+      name: `${tokenResponse.data.athlete.firstname} ${tokenResponse.data.athlete.lastname}`,
+      profile_picture: tokenResponse.data.athlete.profile
+    }
+  }
+});
+
 
   } catch (error) {
     console.error('Strava OAuth error:', error.response?.data || error.message);
@@ -102,7 +105,37 @@ app.get('/api/activities', async (req, res) => {
   }
 });
 
-// SVG Overlay Generation (works without native dependencies)
+// Helper function to get valid access token (with auto-refresh)
+async function getValidAccessToken(accessToken, refreshToken) {
+  try {
+    // Test if current token works
+    await axios.get('https://www.strava.com/api/v3/athlete', {
+      headers: { 'Authorization': `Bearer ${accessToken}` }
+    });
+    
+    return accessToken; // Current token is still valid
+    
+  } catch (error) {
+    if (error.response?.status === 401 && refreshToken) {
+      // Token expired, try to refresh
+      console.log('Access token expired, attempting refresh...');
+      
+      const refreshResponse = await axios.post('https://www.strava.com/oauth/token', {
+        client_id: process.env.STRAVA_CLIENT_ID,
+        client_secret: process.env.STRAVA_CLIENT_SECRET,
+        refresh_token: refreshToken,
+        grant_type: 'refresh_token'
+      });
+      
+      console.log('Token refreshed successfully');
+      return refreshResponse.data.access_token;
+    }
+    
+    throw error; // Re-throw if refresh fails
+  }
+}
+
+// Simple SVG overlay generation (your existing endpoint)
 app.post('/api/generate-overlay', async (req, res) => {
   try {
     const { activityId, aspectRatio = '1:1' } = req.body;
