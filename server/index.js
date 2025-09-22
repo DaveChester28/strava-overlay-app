@@ -78,3 +78,30 @@ app.post('/auth/token', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+app.get('/api/activities', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Access token required' });
+  }
+
+  const accessToken = authHeader.replace('Bearer ', '');
+  
+  try {
+    const activitiesResponse = await axios.get('https://www.strava.com/api/v3/athlete/activities', {
+      headers: { 'Authorization': `Bearer ${accessToken}` },
+      params: { per_page: 10 }
+    });
+
+    res.json({
+      success: true,
+      data: activitiesResponse.data,
+      count: activitiesResponse.data.length
+    });
+
+  } catch (error) {
+    console.error('Activities fetch error:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to fetch activities' });
+  }
+});
