@@ -132,3 +132,68 @@ app.get('/api/activities', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch activities' });
   }
 });
+
+// Add canvas import at top (after other requires)
+const { generateCleanPaceOverlay } = require('./templates/clean-pace');
+
+// Generate overlay endpoint
+app.post('/api/generate-overlay', async (req, res) => {
+  try {
+    const { activityId, templateId = 'clean-pace', aspectRatio = '1:1' } = req.body;
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Access token required' });
+    }
+
+    const accessToken = authHeader.replace('Bearer ', '');
+    
+    // Fetch activity details from Strava
+    const activityResponse = await axios.get(`https://www.strava.com/api/v3/activities/${activityId}`, {
+      headers: { 'Authorization': `Bearer ${accessToken}` }
+    });
+    
+    const activity = activityResponse.data;
+    console.log(`Generating overlay for: ${activity.name}`);
+    
+    // Get dimensions for aspect ratio
+    const dimensions = getDimensions(aspectRatio);
+    
+    // Generate overlay based on template
+    let canvas;
+    switch(templateId) {
+      case 'clean-pace':
+        canvas = generateCleanPaceOverlay(activity, dimensions);
+        break;
+      default:
+        return res.status(400).json({ error: 'Unknown template' });
+    }
+    
+    // Convert to PNG buffer
+    const buffer = canvas.toBuffer('image/png');
+    
+    console.log(`Generated ${buffer.length} byte overlay for activity ${activityId}`);
+    
+    // Return image
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Content-Length', buffer.length);
+    res.setHeader('Content-Disposition', `attachment; filename="${activity.name.replace(/[^a-zA-Z0-9]/g, '-')}-overlay.png"`);
+    res.send(buffer);
+    
+  } catch (error) {
+    console.error('Overlay generation error:', error);
+    if (error.response?.status === 401) {
+      return res.status(401).json({ error: 'Invalid access token' });
+    }
+    res.status(500).json({ error: 'Failed to generate overlay', details: error.message });
+  }
+});
+
+function getDimensions(aspectRatio) {
+  switch(aspectRatio) {
+    case '1:1': return { width: 1080, height: 1080 };
+    case '4:5': return { width: 1080, height: 1350 };
+    case '9:16': return { width: 1080, height: 1920 };
+    default: return { width: 1080, height: 1080 };
+  }
+}
