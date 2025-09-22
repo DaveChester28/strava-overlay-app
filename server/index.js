@@ -1,11 +1,12 @@
 const express = require('express');
+const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.json({ message: 'Hello World! Server is running.' });
+  res.json({ message: 'Strava Overlay API - Production Ready' });
 });
 
 app.get('/health', (req, res) => {
@@ -13,7 +14,7 @@ app.get('/health', (req, res) => {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     strava_client_id: process.env.STRAVA_CLIENT_ID || 'not set',
-    strava_ready: !!process.env.STRAVA_CLIENT_ID
+    strava_ready: !!(process.env.STRAVA_CLIENT_ID && process.env.STRAVA_CLIENT_SECRET)
   });
 });
 
@@ -29,7 +30,7 @@ app.get('/auth/callback', (req, res) => {
     message: 'OAuth code received successfully!',
     code: code,
     scope: scope,
-    next_step: 'Exchange this code for access token'
+    next_step: 'Use POST /auth/token to exchange for access token'
   });
 });
 
@@ -41,17 +42,36 @@ app.post('/auth/token', async (req, res) => {
   }
 
   try {
-    console.log('Received OAuth code:', code);
+    console.log('Exchanging OAuth code with Strava...');
     
+    const tokenResponse = await axios.post('https://www.strava.com/oauth/token', {
+      client_id: process.env.STRAVA_CLIENT_ID,
+      client_secret: process.env.STRAVA_CLIENT_SECRET,
+      code: code,
+      grant_type: 'authorization_code'
+    });
+
+    console.log('Strava OAuth successful for athlete:', tokenResponse.data.athlete.id);
+
     res.json({
       success: true,
-      message: 'Code received - ready for Strava token exchange',
-      code_received: code.substring(0, 8) + '...',
-      next: 'Add axios dependency for real Strava API calls'
+      message: 'Successfully connected to Strava!',
+      data: {
+        access_token: tokenResponse.data.access_token,
+        athlete: {
+          id: tokenResponse.data.athlete.id,
+          name: `${tokenResponse.data.athlete.firstname} ${tokenResponse.data.athlete.lastname}`,
+          profile_picture: tokenResponse.data.athlete.profile
+        }
+      }
     });
-    
+
   } catch (error) {
-    res.status(500).json({ error: 'Token exchange failed' });
+    console.error('Strava OAuth error:', error.response?.data || error.message);
+    res.status(400).json({ 
+      error: 'Failed to exchange code for token',
+      details: error.response?.data || error.message
+    });
   }
 });
 
