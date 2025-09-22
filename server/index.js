@@ -166,18 +166,15 @@ app.post('/api/generate-overlay', async (req, res) => {
     });
     
     const activity = activityResponse.data;
-    console.log(`Activity loaded: ${activity.name} (${(activity.distance/1000).toFixed(1)}km)`);
-    
-    // Get dimensions for the aspect ratio
-    const dimensions = getDimensions(aspectRatio);
-    
-    // Generate SVG based on template choice
-    let svgContent;
-    if (templateId === 'route-glow') {
-      svgContent = generateRouteGlowOverlay(activity, dimensions);
-    } else {
-      svgContent = generateActivitySVG(activity, aspectRatio);
-    }
+console.log(`Activity loaded: ${activity.name}...`);
+
+const dimensions = getDimensions(aspectRatio);  // ← ADD THIS LINE
+const templateId = req.body.templateId || 'clean-pace';
+
+// Generate SVG overlay
+const svgContent = templateId === 'route-glow' 
+  ? generateRouteGlowOverlay(activity, dimensions)
+  : generateActivitySVG(activity, aspectRatio);
     
     res.setHeader('Content-Type', 'image/svg+xml');
     res.setHeader('Content-Disposition', `attachment; filename="${activity.name.replace(/[^a-zA-Z0-9]/g, '-')}-${templateId}-overlay.svg"`);
