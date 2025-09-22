@@ -291,3 +291,20 @@ app.listen(PORT, () => {
   console.log(`Strava Client ID: ${process.env.STRAVA_CLIENT_ID ? 'Configured' : 'Missing'}`);
   console.log(`Features: OAuth, Activities, Overlay Generation, Token Refresh`);
 });
+
+// Add route template import after axios line
+const { generateRouteGlowOverlay } = require('./templates/route-glow');
+
+// Add route template option to overlay generation
+// (Add this inside your overlay generation endpoint, in the switch statement or after activity fetch)
+// Update the overlay generation to support multiple templates:
+
+/*
+Replace this section in your overlay endpoint:
+const svgContent = generateActivitySVG(activity, aspectRatio);
+
+With this:
+const svgContent = req.body.templateId === 'route-glow' 
+  ? generateRouteGlowOverlay(activity, dimensions)
+  : generateActivitySVG(activity, aspectRatio);
+*/
