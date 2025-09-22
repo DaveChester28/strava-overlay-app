@@ -196,3 +196,33 @@ function getDimensions(aspectRatio) {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+// Token refresh endpoint
+app.post('/auth/refresh', async (req, res) => {
+  const { refreshToken } = req.body;
+  
+  if (!refreshToken) {
+    return res.status(400).json({ error: 'Refresh token required' });
+  }
+
+  try {
+    const tokenResponse = await axios.post('https://www.strava.com/oauth/token', {
+      client_id: process.env.STRAVA_CLIENT_ID,
+      client_secret: process.env.STRAVA_CLIENT_SECRET,
+      refresh_token: refreshToken,
+      grant_type: 'refresh_token'
+    });
+
+    res.json({
+      success: true,
+      data: {
+        access_token: tokenResponse.data.access_token,
+        refresh_token: tokenResponse.data.refresh_token,
+        expires_at: tokenResponse.data.expires_at
+      }
+    });
+
+  } catch (error) {
+    res.status(400).json({ error: 'Token refresh failed' });
+  }
+});
