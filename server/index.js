@@ -149,7 +149,7 @@ app.get('/api/activities', async (req, res) => {
 // Enhanced SVG overlay generation
 app.post('/api/generate-overlay', async (req, res) => {
   try {
-    const { activityId, aspectRatio = '1:1' } = req.body;
+    const { activityId, aspectRatio = '1:1', templateId = 'clean-pace' } = req.body;
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -158,7 +158,7 @@ app.post('/api/generate-overlay', async (req, res) => {
 
     const accessToken = authHeader.replace('Bearer ', '');
     
-    console.log(`Generating overlay for activity ${activityId} with aspect ratio ${aspectRatio}`);
+    console.log(`Generating overlay for activity ${activityId} with template ${templateId}, aspect ratio ${aspectRatio}`);
     
     // Fetch activity details
     const activityResponse = await axios.get(`https://www.strava.com/api/v3/activities/${activityId}`, {
@@ -168,15 +168,19 @@ app.post('/api/generate-overlay', async (req, res) => {
     const activity = activityResponse.data;
     console.log(`Activity loaded: ${activity.name} (${(activity.distance/1000).toFixed(1)}km)`);
     
-    // Generate SVG overlay
-const dimensions = getDimensions(aspectRatio);
-const templateId = req.body.templateId || 'clean-pace';
-const svgContent = templateId === 'route-glow' 
-  ? generateRouteGlowOverlay(activity, dimensions)
-  : generateActivitySVG(activity, aspectRatio);
+    // Get dimensions for the aspect ratio
+    const dimensions = getDimensions(aspectRatio);
+    
+    // Generate SVG based on template choice
+    let svgContent;
+    if (templateId === 'route-glow') {
+      svgContent = generateRouteGlowOverlay(activity, dimensions);
+    } else {
+      svgContent = generateActivitySVG(activity, aspectRatio);
+    }
     
     res.setHeader('Content-Type', 'image/svg+xml');
-    res.setHeader('Content-Disposition', `attachment; filename="${activity.name.replace(/[^a-zA-Z0-9]/g, '-')}-overlay.svg"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${activity.name.replace(/[^a-zA-Z0-9]/g, '-')}-${templateId}-overlay.svg"`);
     res.send(svgContent);
     
   } catch (error) {
